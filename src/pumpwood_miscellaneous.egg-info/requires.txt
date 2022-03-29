@@ -1,5 +1,5 @@
-djangorestframework
-python-slugify
-pandas
-boto3
-google-cloud-storage
+djangorestframework==3.13.1
+python-slugify==6.1.1
+pandas>=1.0
+boto3==1.21.29
+google-cloud-storage==1.28.1
