@@ -1,0 +1,3 @@
+djangorestframework
+python-slugify
+pandas
