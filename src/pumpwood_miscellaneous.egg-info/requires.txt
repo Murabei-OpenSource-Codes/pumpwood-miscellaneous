@@ -1,3 +1,5 @@
 djangorestframework
 python-slugify
 pandas
+boto3
+google-cloud-storage

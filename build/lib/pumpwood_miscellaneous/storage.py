@@ -2,9 +2,9 @@
 import io
 import datetime
 from werkzeug.utils import secure_filename
-from pumpwood_flaskmisc.storage_connectors.google import PumpWoodGoogleBucket
-from pumpwood_flaskmisc.storage_connectors.local import PumpWoodLocalBucket
-from pumpwood_flaskmisc.storage_connectors.aws import PumpWoodAwsS3
+from .storage_connectors.google import PumpWoodGoogleBucket
+from .storage_connectors.local import PumpWoodLocalBucket
+from .storage_connectors.aws import PumpWoodAwsS3
 
 
 def allowed_extension(filename, allowed_extensions,
