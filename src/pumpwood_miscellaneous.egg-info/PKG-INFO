@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pumpwood-miscellaneous
-Version: 0.1
+Version: 0.3
 Summary: Miscellaneous class and funcitions used in Pumpwood.
 Home-page: https://github.com/Murabei-OpenSource-Codes/pumpwood-miscellaneous
 Author: Murabei Data Science
@@ -129,7 +129,7 @@ far Google bucket and AWS S3 were implemented.
 
 ### PumpWoodStorage
 ```
-from pumpwood_flaskmisc.storage import PumpWoodStorage
+from pumpwood_miscellaneous.storage import PumpWoodStorage
 
 storage_google = PumpWoodStorage(
   storage_type="google_bucket",

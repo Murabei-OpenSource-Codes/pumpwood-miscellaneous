@@ -114,7 +114,7 @@ far Google bucket and AWS S3 were implemented.
 
 ### PumpWoodStorage
 ```
-from pumpwood_flaskmisc.storage import PumpWoodStorage
+from pumpwood_miscellaneous.storage import PumpWoodStorage
 
 storage_google = PumpWoodStorage(
   storage_type="google_bucket",
