@@ -42,6 +42,9 @@ class PumpWoodStorage():
             elif storage_type == 'aws_s3':
                 self.storage_object = PumpWoodAwsS3(
                     bucket_name=kwargs['bucket_name'])
+            elif storage_type == 'azure_bucket':
+                self.storage_object = PumpWoodAwsS3(
+                    bucket_name=kwargs['bucket_name'])
             elif storage_type == 'local':
                 self.storage_object = PumpWoodLocalBucket(
                     folder_path=kwargs['folder_path'])
