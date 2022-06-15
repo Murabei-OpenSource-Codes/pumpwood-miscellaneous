@@ -7,7 +7,7 @@ from ._general import (
     FlaskStreamUploadWrapper, FlaskStreamDownloadWrapper)
 
 
-class PumpWoodAzureBlob():
+class PumpWoodAzureStorage():
     """Class to make comunication with Azure Blob Storage."""
 
     def __init__(self, bucket_name: str):
@@ -20,6 +20,8 @@ class PumpWoodAzureBlob():
         # Collection AZURE_STORAGE_CONNECTION_STRING from environment
         # variables
         connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+        if connect_str is None:
+            raise Exception("AZURE_STORAGE_CONNECTION_STRING not set")
         blob_service = BlobServiceClient.from_connection_string(
             connect_str)
         self._client = blob_service.get_container_client(container=bucket_name)
@@ -61,29 +63,29 @@ class PumpWoodAzureBlob():
             Exception("if_exists must be in {}".format(if_exists_opt))
 
         blob = self._client.get_blob_client(blob=file_path)
-        if blob.exists() and if_exists == 'fail':
+        blob_exists = blob.exists()
+        if blob_exists and if_exists == 'fail':
             raise Exception('There is a file with same name on bucket')
-
         elif if_exists in ['append_breakline', 'append']:
             old_text = blob.download_blob().readall()
             old_text = old_text + b'\n' \
                 if if_exists == 'append_breakline' else old_text
             data = old_text + data
 
+        # Removendo o blob caso tenha mesmo nome
+        if blob_exists:
+            blob.delete_blob()
+
         blob.upload_blob(data)
         return file_path
 
-    def write_file_stream(self, file_path: str, data_stream: io.BytesIO,
-                          chunk_size: int = 1024 * 1024):
+    def write_file_stream(self, file_path: str, data_stream: io.BytesIO):
         """
         Write file as stream to google cloud.
 
         Args:
             file_path (str): Path to save the stream in Google Storage Bucket.
             data_stream (io.BytesIO): Data stream.
-        Kwargs:
-            chunk_size(int): Size of the chuck to be transmited, default for
-                1024 * 1024 (1Mb).
         Return (dict):
             Return the file path used to save data ("file_path" key) and the
             total of bytes that were transmited.
@@ -91,9 +93,17 @@ class PumpWoodAzureBlob():
             No particular raises at this function.
         """
         blob = self._client.get_blob_client(blob=file_path)
-        blob.upload_blob(data_stream)
-        properties = blob.get_blob_properties()
+        blob_exists = blob.exists()
 
+        # Removendo o blob caso tenha mesmo nome
+        if blob_exists:
+            blob.delete_blob()
+
+        file_stream_obj = AzureStorageUploadFileStream(
+            client=blob, data_stream=data_stream)
+        file_stream_obj.write()
+
+        properties = blob.get_blob_properties()
         return {
             "file_path": file_path, "bytes_uploaded": properties['size']}
 
@@ -109,27 +119,31 @@ class PumpWoodAzureBlob():
         Raises:
             No specific raises.
         """
-        blob = self._google_bucket.blob(file_path)
-        iterator = blob.download_blob()
-
-        return file_stream_obj.read_iterator()
+        download_blob = self._client.get_blob_client(
+            blob=file_path).download_blob()
+        return download_blob.chunks()
 
     def delete_file(self, file_path: str):
-        blob = self._google_bucket.blob(file_path)
+        blob = self._client.get_blob_client(blob=file_path)
         if not blob.exists():
             Exception('file_path %s does not exist' % file_path)
-        blob.delete()
+        blob.delete_blob()
+
+        if not blob.exists():
+            raise Exception("Blob was not deleted from Azure")
         return True
 
     def read_file(self, file_path: str):
-        blob = self._google_bucket.blob(file_path)
+        blob = self._client.get_blob_client(blob=file_path)
         if not blob.exists():
             Exception('file_path %s does not exist' % file_path)
-        data = blob.download_as_string()
-        content_type = blob.content_type
+        data = blob.download_blob().readall()
+
+        properties = blob.get_blob_properties()
+        content_type = properties["content_settings"]["content_type"]
         return {'data': data, 'content_type': content_type}
 
-    def download_to_file(self, file_path: str, file_obj):
+    def download_to_file(self, file_path: str, file_obj: any):
         """
         Download file from storage and save it in a local path.
 
@@ -141,66 +155,52 @@ class PumpWoodAzureBlob():
         Raises:
             No specific raises.
         """
-        blob = self._google_bucket.blob(file_path, chunk_size=262144*5)
-        blob.download_to_file(file_obj)
+        blob = self._client.get_blob_client(blob=file_path)
+        download_blob = blob.download_blob()
+        download_blob.download_to_stream(file_obj)
         file_obj.close()
 
 
 class AzureStorageUploadFileStream:
     """Create a upload file stream for Google Storage."""
 
-    def __init__(self, client: storage.Client, blob: Blob,
-                 bucket_name: str, chunk_size: int, data_stream: io.BytesIO):
-        self._client = client
-        self._transport = AuthorizedSession(
-            credentials=self._client._credentials)
-        self._chunk_size = chunk_size
+    def __init__(self, blob: BlobClient, data_stream: io.BytesIO, **kwargs):
+        """
+        __init__.
+
+        Args:
+            blob [BlobClient]:
+            data_stream [io.BytesIO]:
+        Return:
+            Azure Storage Upload FileStream
+        """
         self._blob = blob
-
-        url_template = 'https://www.googleapis.com/upload/storage/v1/b/' + \
-            '{bucket_name}/o?uploadType=resumable'
-        url = url_template.format(bucket_name=bucket_name)
-
-        self._request = requests.ResumableUpload(
-            upload_url=url, chunk_size=self._chunk_size)
-
-        stream = FlaskStreamUploadWrapper(data_stream)
-        self._request.initiate(
-            transport=self._transport,
-            content_type='application/octet-stream',
-            stream=stream, stream_final=False,
-            metadata={'name': self._blob.name})
+        self._stream = FlaskStreamUploadWrapper(data_stream)
 
     def write(self):
-        self._request.transmit_next_chunk(self._transport)
-        return self._request.finished
+        """Write stream to cloud."""
+        self._blob.upload_blob(self._stream)
+        return True
 
     def get_bytes_uploaded(self):
-        return self._request.bytes_uploaded
+        return self._stream.bytes_position
 
 
-class AzureStorageDownloadFileStream:
-    """Create a download file stream for Google Storage."""
-
-    def __init__(self, client: storage.Client, blob: Blob,
-                 bucket_name: str, chunk_size: int):
-        self._client = client
-        self._transport = AuthorizedSession(
-            credentials=self._client._credentials)
-        self._chunk_size = chunk_size
-        self._blob = blob
-        self.bytes_position = 0
-        url = self._blob._get_download_url(client=client)
-
-        self._stream = FlaskStreamDownloadWrapper()
-        self._request = ChunkedDownload(
-            url, chunk_size, self._stream)
-
-    def read_iterator(self):
-        """Create an interator to download data from Google Cloud."""
-        while True:
-            self._request.consume_next_chunk(self._transport)
-            last_chunck = self._stream.get_last_chunk()
-            yield last_chunck
-            if self._request.finished:
-                break
+# class AzureStorageDownloadFileStream:
+#     """Create a download file stream for Google Storage."""
+#
+#     def __init__(self, blob: Blob, bucket_name: str, chunk_size: int):
+#         self._chunk_size = chunk_size
+#         self._blob = blob
+#         self.bytes_position = 0
+#
+#         self._stream = FlaskStreamDownloadWrapper()
+#
+#     def read_iterator(self):
+#         """Create an interator to download data from Google Cloud."""
+#         while True:
+#             self._request.consume_next_chunk(self._transport)
+#             last_chunck = self._stream.get_last_chunk()
+#             yield last_chunck
+#             if self._request.finished:
+#                 break

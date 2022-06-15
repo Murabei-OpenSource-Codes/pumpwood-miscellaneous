@@ -16,5 +16,6 @@ src/pumpwood_miscellaneous.egg-info/top_level.txt
 src/pumpwood_miscellaneous/storage_connectors/__init__.py
 src/pumpwood_miscellaneous/storage_connectors/_general.py
 src/pumpwood_miscellaneous/storage_connectors/aws.py
+src/pumpwood_miscellaneous/storage_connectors/azure.py
 src/pumpwood_miscellaneous/storage_connectors/google.py
 src/pumpwood_miscellaneous/storage_connectors/local.py
