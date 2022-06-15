@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from .storage_connectors.google import PumpWoodGoogleBucket
 from .storage_connectors.local import PumpWoodLocalBucket
 from .storage_connectors.aws import PumpWoodAwsS3
+from .storage_connectors.azure import PumpWoodAzureStorage
 
 
 def allowed_extension(filename, allowed_extensions,
@@ -41,6 +42,9 @@ class PumpWoodStorage():
                     bucket_name=kwargs['bucket_name'])
             elif storage_type == 'aws_s3':
                 self.storage_object = PumpWoodAwsS3(
+                    bucket_name=kwargs['bucket_name'])
+            elif storage_type == 'azure_storage':
+                self.storage_object = PumpWoodAzureStorage(
                     bucket_name=kwargs['bucket_name'])
             elif storage_type == 'local':
                 self.storage_object = PumpWoodLocalBucket(
