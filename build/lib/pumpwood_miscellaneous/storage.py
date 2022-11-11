@@ -262,3 +262,19 @@ class PumpWoodStorage():
         else:
             date = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
             return "{0}___{1}".format(date, file_name)
+
+    def get_file_hash(self, file_path: str):
+        """
+        Return file hash calculated at cloud storage provider.
+
+        Args:
+            file_path (str): File path.
+        Kwargs:
+            No Kwargs.
+        Returns:
+            str: Hash of the file.
+        Raises:
+            Exception("file_path {file_path} does not exist")
+                If file is not found on storage.
+        """
+        return self.storage_object.get_file_hash(file_path=file_path)

@@ -199,3 +199,19 @@ class PumpWoodAwsS3():
             Bucket=self._bucket_name, Key=file_path,
             Fileobj=file_obj)
         file_obj.close()
+
+    def get_file_hash(self, file_path: str):
+        """
+        Return file hash calculated at cloud storage provider.
+
+        Args:
+            file_path (str): File path.
+        Kwargs:
+            No Kwargs.
+        Returns:
+            str: Hash of the file.
+        Raises:
+            Exception("file_path {file_path} does not exist")
+                If file is not found on storage.
+        """
+        return "not implemented"
