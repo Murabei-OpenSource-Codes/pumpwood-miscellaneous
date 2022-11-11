@@ -160,6 +160,22 @@ class PumpWoodAzureStorage():
         download_blob.download_to_stream(file_obj)
         file_obj.close()
 
+    def get_file_hash(self, file_path: str):
+        """
+        Return file hash calculated at cloud storage provider.
+
+        Args:
+            file_path (str): File path.
+        Kwargs:
+            No Kwargs.
+        Returns:
+            str: Hash of the file.
+        Raises:
+            Exception("file_path {file_path} does not exist")
+                If file is not found on storage.
+        """
+        return "not implemented"
+
 
 class AzureStorageUploadFileStream:
     """Create a upload file stream for Google Storage."""
