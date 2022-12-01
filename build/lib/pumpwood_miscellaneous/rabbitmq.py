@@ -6,7 +6,7 @@ from pumpwood_communication.exceptions import PumpWoodException
 
 
 class PumpWoodRabbitMQ:
-    """Comunication with RabbitMQ."""
+    """Communication with RabbitMQ."""
 
     queue = None
 
@@ -32,7 +32,7 @@ class PumpWoodRabbitMQ:
             No exceptions.
 
         Example:
-            >>> test = PumpWoodRabbitMQ(queue='teste', username='guest'
+            >>> test = PumpWoodRabbitMQ(queue='test', username='guest'
                 , password='guest', host='localhost', port='')
 
         """
@@ -54,11 +54,10 @@ class PumpWoodRabbitMQ:
         self.__init__(queue, username, password, host, port)
 
     def send(self, data: any, queue: str = None) -> None:
-        """
-        Send RabitMQ a msg.
+        """Send RabbitMQ a msg.
 
         Args:
-            data(any): Data to be sent to RabitMQ.
+            data(any): Data to be sent to RabbitMQ.
         Kwargs:
             queue(str): An different queue to send data.
         Returns:
@@ -68,14 +67,13 @@ class PumpWoodRabbitMQ:
             No exceptions.
 
         Example:
-            >>> test = PumpWoodRabbitMQ(queue='teste', username='guest'
+            >>> test = PumpWoodRabbitMQ(queue='test', username='guest'
                 , password='guest', host='localhost', port='')
-
         """
         if queue is None and self.queue is None:
             raise PumpWoodException(
                 message=(
-                    "queue argment is None and queue not set at"
+                    "queue argument is None and queue not set at "
                     "constructor."))
         credentials = pika.PlainCredentials(self._username, self._password)
         connection = pika.BlockingConnection(
