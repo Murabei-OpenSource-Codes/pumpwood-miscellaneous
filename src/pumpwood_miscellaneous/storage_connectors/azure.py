@@ -8,7 +8,7 @@ from ._general import (
 
 
 class PumpWoodAzureStorage():
-    """Class to make comunication with Azure Blob Storage."""
+    """Class to make communication with Azure Blob Storage."""
 
     def __init__(self, bucket_name: str):
         """
