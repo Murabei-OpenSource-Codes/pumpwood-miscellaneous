@@ -11,8 +11,8 @@ class PumpWoodLocalBucket():
 
     def write_file(self, file_path: str, data: bytes, if_exists: str = 'fail',
                    content_type='text/plain') -> str:
-        if if_exists in ['overide', 'append_breakline', 'append', 'fail']:
-            template = "if_exists must be in ['overide', " + \
+        if if_exists in ['overwrite', 'append_breakline', 'append', 'fail']:
+            template = "if_exists must be in ['overwrite', " + \
                 "'append_breakline', 'append', 'fail']"
             Exception(template)
 

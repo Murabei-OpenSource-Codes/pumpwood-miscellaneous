@@ -1,5 +1,6 @@
 """Google Storage Cloud."""
 import io
+import pandas as pd
 from typing import Callable
 from google.cloud import storage
 from google.cloud.storage.blob import Blob
@@ -36,6 +37,18 @@ class PumpWoodGoogleBucket():
         """
         blob = self._google_bucket.blob(file_path)
         return blob.exists()
+    
+    def list_files(self, path: str = "") -> list:
+        """
+        List file at storage path.
+
+        Args:
+            path [str]: Path of the storage to list files.
+        Return [list]:
+            List of all files under path (sub-folders).
+        """
+        blobs = self._google_bucket.list_blobs(prefix=path)
+        return [b.name for b in blobs]
 
     def write_file(self, file_path: str, data: bytes, if_exists: str = 'fail',
                    content_type='text/plain') -> str:
@@ -45,14 +58,14 @@ class PumpWoodGoogleBucket():
         Args:
             file_path (str): Path to save the file.
             data (str): File content in bytes.
-            if_exists (str): if_exists must be in 'overide',
-                'overide_streaming' (stream file to overide if exists),
+            if_exists (str): if_exists must be in 'overwrite',
+                'overwrite_streaming' (stream file to overwrite if exists),
                 'append_breakline' (append content with a breakline between),
                 'append' (append content without break line),
                 'fail' (fail if file exists)]
             content_type (str): Mime-type of the content.
         """
-        if_exists_opt = ['overide', 'overide_streaming', 'append_breakline',
+        if_exists_opt = ['overwrite', 'overwrite_streaming', 'append_breakline',
                          'append', 'fail']
         if if_exists in if_exists_opt:
             Exception("if_exists must be in {}".format(if_exists_opt))

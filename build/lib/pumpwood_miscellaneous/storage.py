@@ -1,6 +1,7 @@
 """PumpWood Storage Module."""
 import io
 import datetime
+import os
 from werkzeug.utils import secure_filename
 from .storage_connectors.google import PumpWoodGoogleBucket
 from .storage_connectors.local import PumpWoodLocalBucket
@@ -60,8 +61,11 @@ class PumpWoodStorage():
             raise Exception('storage_type already initialized.')
 
     def _update_file_path(self, file_path):
-        return (self.base_path + '/' + file_path
-                if self.base_path is not None else file_path)
+        """Update file path adding base_path to the beginning."""
+        return (
+            os.path.join(self.base_path, file_path)
+            if self.base_path is not None
+            else file_path)
 
     def check_file_exists(self, file_path: str) -> bool:
         """
@@ -75,6 +79,18 @@ class PumpWoodStorage():
         """
         return self.storage_object.check_file_exists(
             file_path=file_path)
+
+    def list_files(self, path: str = "") -> list:
+        """
+        List file at storage path.
+
+        Args:
+            path [str]: Path of the storage to list files.
+        Return [list]:
+            List of all files under path (sub-folders).
+        """
+        updated_path = self._update_file_path(path)
+        return self.storage_object.list_files(path=updated_path)
 
     def write_file(self, file_path: str, file_name: str, data: bytes,
                    unique_name: bool = False, if_exists: str = 'fail',
@@ -90,7 +106,7 @@ class PumpWoodStorage():
             if_exists='fail'(str):
                 fail to raise Exception if exists, append_breakline to append
                 with a breakline between old content and new, append to
-                append without breakline, overide to overide file.
+                append without breakline, overwrite to overwrite file.
 
             content_type='text/plain'(str): File content type.
 
@@ -107,7 +123,7 @@ class PumpWoodStorage():
             >>> test.write_file(
                     'chubaca_eh_legal.txt',
                     data=b"dfjkasnfdkjsnkljsnlkjsn\ndkakjfnas\n",
-                    if_exists='overide')
+                    if_exists='overwrite')
 
         """
         file_path = self._update_file_path(file_path)
