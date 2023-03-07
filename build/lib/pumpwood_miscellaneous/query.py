@@ -1,13 +1,117 @@
-"""Build sqlalchemy queries from filter_dict, exclude_dict and order_by."""
+"""
+Build sqlalchemy queries from filter_dict, exclude_dict and order_by.
+"""
+import copy
+import numpy as np
+import simplejson as json
+import pandas as pd
 from sqlalchemy.sql import operators
 from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy import desc
 from pumpwood_communication.exceptions import PumpWoodQueryException
+from pumpwood_communication.serializers import CompositePkBase64Converter
+
+
+def open_composite_pk(query_dict: dict, is_filter: bool) -> dict:
+    """
+    Open filter/exclude dictionary with pk on composite primary keys.
+
+    Open filter dict to filter all components of the composite primary
+    keys. For exclude dict use just the id field from the composite
+    primary.
+
+    Args:
+        query_dict [dict]:
+        filter [bool]:
+    
+    Kwargs:
+        No kwargs.
+    
+    Return [dict]:
+        Dictionary with adjusted filter and exclude dictionaries.
+    """
+
+    def convert_np(obj):
+        """Helps to treat numpy types that are not converted by SQLAlchemy."""
+        if isinstance(obj, np.generic):
+            return obj.item()
+        else:
+            return obj
+
+    # Id is always unique even in partitioned tables,
+    # but using other fields helps Postgres to find
+    # information.
+    #
+    # Filter queries, use both id and other primary keys elements to
+    # help postgres to prune sub-partitions on query execution.
+    #
+    # On exclude query, using just id is the same of including all
+    # composite primary fields. Since exclude filter might not lead to
+    # partitions prune, they are excluded from dictionary.
+    query_dict_keys = query_dict.keys()
+    new_query_dict = copy.deepcopy(query_dict)
+    for key in query_dict_keys:
+        count_pk_filters = 0
+        if "pk" in key:
+            if key == "pk":
+                if is_filter:
+                    open_composite = CompositePkBase64Converter.load(
+                        new_query_dict["pk"])
+                    new_query_dict.update(open_composite)
+                else:
+                    open_composite = CompositePkBase64Converter.load(
+                        new_query_dict["pk"])
+                    new_query_dict["id"] = open_composite["id"]
+
+                count_pk_filters = count_pk_filters + 1
+                del new_query_dict["pk"]
+
+            elif key == "pk__in":
+                if is_filter:
+                    open_composite = pd.DataFrame(
+                            pd.Series(new_query_dict["pk__in"]).apply(
+                                CompositePkBase64Converter.load).tolist())
+                    for col in open_composite.columns:
+                        new_query_dict[col + "__in"] = \
+                            [convert_np(x) for x in open_composite[col].unique()]
+                else:
+                    open_composite = pd.DataFrame(
+                            pd.Series(new_query_dict["pk__in"]).apply(
+                                CompositePkBase64Converter.load).tolist())
+                    new_query_dict["id__in"] = \
+                        [convert_np(x) for x in open_composite["id"].unique()]
+
+                count_pk_filters = count_pk_filters + 1
+                del new_query_dict["pk__in"]
+
+            else:
+                temp_msg_dict = (
+                    "filter_dict" if is_filter else "exclude_dict")
+                msg = (
+                    "Using composite pk to filter queries must use just "
+                    "equal and in operators and with join. "
+                    "{temp_msg_dict}: \n {query_dict}").format(
+                        temp_msg_dict=temp_msg_dict,
+                        query_dict=query_dict.keys())
+                raise PumpWoodQueryException(
+                    message=msg, payload={
+                        "query_dict": query_dict,
+                        "is_filter": is_filter})
+
+        if 1 < count_pk_filters:
+            msg = (
+                "Please give some help for the dev here, use just one "
+                "filter_dict entry for composite primary key...")
+            raise PumpWoodQueryException(
+                message=msg, payload={
+                    "query_dict": query_dict,
+                    "is_filter": is_filter})
+    return new_query_dict
 
 
 class SqlalchemyQueryMisc():
-    """Class to help buildinng queries with dictionary of list."""
+    """Class to help building queries with dictionary of list."""
 
     _underscore_operators = {
         'gt': lambda c, x: operators.gt(c, x),
@@ -72,8 +176,8 @@ class SqlalchemyQueryMisc():
         related models mapped by query string and the columns and operators to
         be used.
         Can also be used for order_by arguments where the keys of the query
-        dict especify the joins and the value must be either asc or desc for
-        ascendent and decrescent ordenation respectively.
+        dict specify the joins and the value must be either asc or desc for
+        ascendent and decrescent order respectively.
 
         Args:
             object_model (sqlalchemy.DeclarativeModel): Model over which will
@@ -92,7 +196,7 @@ class SqlalchemyQueryMisc():
             value in operation.
 
         Raises:
-            PumpWoodQueryException (It is not permited more tokens after
+            PumpWoodQueryException (It is not permitted more tokens after
                                     operation underscore (%s).)
                 Original query string (%s)) If a operation_key is recognized
                 and there is other relations after it.
@@ -102,13 +206,13 @@ class SqlalchemyQueryMisc():
                                    query, underscore token ({token}) not found
                                    on model columns, relations or operations.
                                    Original query string:...)
-                If a token (value separated by "__" is not reconized as neither
-                relations, column and operation)
+                If a token (value separated by "__" is not recognized as
+                neither relations, column and operation)
                 Ex: attribute__description__last_update_at
 
             PumpWoodQueryException('Order value %s not implemented , sup and
-                                   desc avaiable, for column %s. Original query
-                                   string %s')
+                                   desc available, for column %s. Original
+                                   query string %s')
                 If value in query dict when order=True is different from
                 'asc' and 'desc'.
 
@@ -154,8 +258,8 @@ class SqlalchemyQueryMisc():
 
                 # Check if a search for a relation
                 if token in relations.keys():
-                    # It is not possible to query for relations after specifing
-                    # a collumn
+                    # It is not possible to query for relations after specifying
+                    # a column
                     if column is not None:
                         template = "It is not permited more relations " + \
                             "after column underscore (%s). Original query " + \
@@ -199,7 +303,7 @@ class SqlalchemyQueryMisc():
             if order:
                 if value not in ['asc', 'desc']:
                     template = "Order value %s not implemented , sup and " + \
-                        "desc avaiable, for column %s. Original query " + \
+                        "desc available, for column %s. Original query " + \
                         "string %s"
                     raise PumpWoodQueryException(
                         template % (value, column.key, arg))
@@ -242,7 +346,7 @@ class SqlalchemyQueryMisc():
     def sqlalchemy_kward_query(cls, object_model, filter_dict={},
                                exclude_dict={}, order_by=[]):
         """
-        Build SQLAlchemy engine string acordind to database parameters.
+        Build SQLAlchemy engine string according to database parameters.
 
         Args:
             filter_dict (dict): Dictionary to be used in filtering.
@@ -266,6 +370,15 @@ class SqlalchemyQueryMisc():
                 order_by = ['-value', 'attribute__description'])
 
         """
+        mapper = inspect(object_model.__table__)
+        primary_keys = [
+            col.name for col in list(mapper.c) if col.primary_key]
+        if 1 < len(primary_keys):
+            filter_dict = open_composite_pk(
+                query_dict=filter_dict, is_filter=True)
+            exclude_dict = open_composite_pk(
+                query_dict=exclude_dict, is_filter=False)
+
         order_by_dict = {}
         for o in order_by:
             if o[0] == '-':

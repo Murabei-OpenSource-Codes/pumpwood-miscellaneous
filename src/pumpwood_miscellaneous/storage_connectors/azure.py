@@ -8,7 +8,7 @@ from ._general import (
 
 
 class PumpWoodAzureStorage():
-    """Class to make comunication with Azure Blob Storage."""
+    """Class to make communication with Azure Blob Storage."""
 
     def __init__(self, bucket_name: str):
         """
@@ -42,6 +42,18 @@ class PumpWoodAzureStorage():
         blob = self._client.get_blob_client(blob=file_path)
         return blob.exists()
 
+    def list_files(self, path: str = "") -> list:
+        """
+        List file at storage path.
+
+        Args:
+            path [str]: Path of the storage to list files.
+        Return [list]:
+            List of all files under path (sub-folders).
+        """
+        raise NotImplementedError(
+            "list_files not implemented for Azure Storage")
+
     def write_file(self, file_path: str, data: bytes, if_exists: str = 'fail',
                    content_type='text/plain') -> str:
         """
@@ -50,14 +62,14 @@ class PumpWoodAzureStorage():
         Args:
             file_path (str): Path to save the file.
             data (str): File content in bytes.
-            if_exists (str): if_exists must be in 'overide',
-                'overide_streaming' (stream file to overide if exists),
+            if_exists (str): if_exists must be in 'overwrite',
+                'overwrite_streaming' (stream file to overwrite if exists),
                 'append_breakline' (append content with a breakline between),
                 'append' (append content without break line),
                 'fail' (fail if file exists)]
             content_type (str): Mime-type of the content.
         """
-        if_exists_opt = ['overide', 'overide_streaming', 'append_breakline',
+        if_exists_opt = ['overwrite', 'overwrite_streaming', 'append_breakline',
                          'append', 'fail']
         if if_exists in if_exists_opt:
             Exception("if_exists must be in {}".format(if_exists_opt))
@@ -159,6 +171,22 @@ class PumpWoodAzureStorage():
         download_blob = blob.download_blob()
         download_blob.download_to_stream(file_obj)
         file_obj.close()
+
+    def get_file_hash(self, file_path: str):
+        """
+        Return file hash calculated at cloud storage provider.
+
+        Args:
+            file_path (str): File path.
+        Kwargs:
+            No Kwargs.
+        Returns:
+            str: Hash of the file.
+        Raises:
+            Exception("file_path {file_path} does not exist")
+                If file is not found on storage.
+        """
+        return "not implemented"
 
 
 class AzureStorageUploadFileStream:
