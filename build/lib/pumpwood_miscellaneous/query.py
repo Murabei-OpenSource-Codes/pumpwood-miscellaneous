@@ -157,6 +157,13 @@ class SqlalchemyQueryMisc():
         "json_containshas_all": lambda c, x: c.containshas_all(x),
         "json_has_any": lambda c, x: c.has_any(x),
         "json_has_key": lambda c, x: c.has_key(x),
+
+        # Trigram text search
+        "similarity": operators.custom_op("%%"),
+        "word_similar_left": operators.custom_op("<%%"),
+        "word_similar_right": operators.custom_op("%%>"),
+        "strict_word__similar_left": operators.custom_op("<<%%"),
+        "strict_word__similar_right": operators.custom_op("%%>>"),
     }
 
     @classmethod
@@ -228,8 +235,6 @@ class SqlalchemyQueryMisc():
             column = None
             json_key = None
             actual_model = object_model
-            # q = object_model.query.with_entities(object_model.id)
-            # token = arg.split('__')[0]
             for token in arg.split('__'):
                 # Check if it is to check a json key
                 json_list = token.split("->")
@@ -320,8 +325,10 @@ class SqlalchemyQueryMisc():
                             columns_values_filter.append(
                                 {'column': column, 'operation': lambda c: c})
             else:
+                # operation_key is not set consider it a exact match
                 if operation_key is None:
                     operation_key = 'exact'
+
                 if json_key is not None:
                     columns_values_filter.append(
                         {'column': column[json_key].astext,
@@ -400,7 +407,7 @@ class SqlalchemyQueryMisc():
             q = q.filter(fil['operation'](fil['column'], fil['value']))
         # Exclude clauses
         for excl in exclude_query['columns']:
-            q = q.filter(~excl['operation'](c=excl['column'], x=excl['value']))
+            q = q.filter(~excl['operation'](excl['column'], excl['value']))
         # Order clauses
         for ord in order_query['columns']:
             q = q.order_by(ord['operation'](ord['column']))
