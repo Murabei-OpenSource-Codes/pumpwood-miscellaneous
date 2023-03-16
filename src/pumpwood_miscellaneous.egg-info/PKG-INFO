@@ -1,12 +1,11 @@
 Metadata-Version: 2.1
 Name: pumpwood-miscellaneous
-Version: 0.14
+Version: 0.15
 Summary: Miscellaneous class and funcitions used in Pumpwood.
 Home-page: https://github.com/Murabei-OpenSource-Codes/pumpwood-miscellaneous
 Author: Murabei Data Science
 Author-email: a.baceti@murabei.com
 License: BSD-3-Clause License
-Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
@@ -157,5 +156,3 @@ allowed_extension(
     filename="file.xlsx", allowed_extensions=["xls", "xlsx", "parquet"],
     exception=Exception)
 ```
-
-

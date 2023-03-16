@@ -51,8 +51,9 @@ class PumpWoodAzureStorage():
         Return [list]:
             List of all files under path (sub-folders).
         """
-        raise NotImplementedError(
-            "list_files not implemented for Azure Storage")
+        return [
+            x['name']
+            for x in self._client.list_blobs(name_starts_with=path)]
 
     def write_file(self, file_path: str, data: bytes, if_exists: str = 'fail',
                    content_type='text/plain') -> str:
