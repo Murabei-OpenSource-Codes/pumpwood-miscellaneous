@@ -66,7 +66,13 @@ class PumpWoodAwsS3():
         Return [list]:
             List of all files under path (sub-folders).
         """
-        raise NotImplementedError("list_files not implemented for AWS Storage")
+        self._s3_resource.put_object(
+            Body=data, Bucket=self._bucket_name,
+            Key=file_path)
+
+        s3_files = self._s3_resource.list_objects(
+            Bucket=self._bucket_name, Prefix=path)
+        return [contents['Key'] for contents in s3_files['Contents']]
 
     def write_file(self, file_path: str, data: bytes, if_exists: str = 'fail',
                    content_type='text/plain') -> str:
@@ -126,23 +132,32 @@ class PumpWoodAwsS3():
         Raises:
             No particular raises at this function.
         """
-        raise NotImplementedError(
-            "write_file_stream not implemented for AWS S3")
+        self._s3_resource.upload_fileobj(
+            Fileobj=data, Bucket=self._bucket_name,
+            Key=file_path)
+        response = self._s3_resource.get_object(
+            Bucket=self._bucket_name, Key=file_path)
+        return {
+            "file_path": file_path,
+            "bytes_uploaded": response["ContentLength"]}
 
-    def get_read_file_iterator(self,  file_path: str,
-                               chunk_size: int = 1024 * 1024) -> Callable:
+    def get_read_file_iterator(self, file_path: str, **kwargs) -> Callable:
         """
         Return an iterator to stream download data in flask.
 
         Args:
             file_path (str): Storage path.
         Kwargs:
-            chunk_size (int): Chunk size in bytes, default to 1Mb.
+            No Kwargs
         Raises:
-            No specific raises.
+            Exception('file_path {file_path} does not exist'): Raise if
+                file could not be found on s3.
         """
-        raise NotImplementedError(
-            "get_read_file_iterator not implemented for AWS S3")
+        if not self.check_file_exists(file_path=file_path):
+            raise Exception('file_path %s does not exist' % file_path)
+        response = self._s3_resource.get_object(
+            Bucket=self._bucket_name, Key=file_path)
+        return response["Body"]
 
     def delete_file(self, file_path: str) -> bool:
         """
