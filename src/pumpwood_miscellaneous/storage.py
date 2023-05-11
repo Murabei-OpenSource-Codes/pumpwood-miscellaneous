@@ -80,21 +80,25 @@ class PumpWoodStorage():
         return self.storage_object.check_file_exists(
             file_path=file_path)
 
-    def list_files(self, path: str = "") -> list:
+    def list_files(self, path: str = "",
+                   update_file_path: bool = True) -> list:
         """
         List file at storage path.
 
         Args:
             path [str]: Path of the storage to list files.
+            update_file_path [bool]: If update path to add base directory.
         Return [list]:
             List of all files under path (sub-folders).
         """
-        updated_path = self._update_file_path(path)
+        if update_file_path:
+            updated_path = self._update_file_path(path)
         return self.storage_object.list_files(path=updated_path)
 
     def write_file(self, file_path: str, file_name: str, data: bytes,
                    unique_name: bool = False, if_exists: str = 'fail',
-                   content_type='text/plain'):
+                   content_type='text/plain', update_file_path: bool = True,
+                   safe_filename: bool = True):
         r"""
         Write a file to the storage.
 
@@ -126,17 +130,21 @@ class PumpWoodStorage():
                     if_exists='overwrite')
 
         """
-        file_path = self._update_file_path(file_path)
-        file_name = self._create_safe_filename(
-            file_name=file_name, unique_name=unique_name)
-        file_path = file_path + file_name
+        if update_file_path:
+            file_path = self._update_file_path(file_path)
+        if safe_filename:
+            file_name = self._create_safe_filename(
+                file_name=file_name, unique_name=unique_name)
+        file_path = os.path.join(file_path, file_name)
         return self.storage_object.write_file(
             file_path=file_path, data=data, if_exists=if_exists,
             content_type=content_type)
 
     def write_file_stream(self, file_path: str, file_name: str,
                           data_stream: io.BytesIO, unique_name: bool = False,
-                          chunk_size: int = 1024 * 1024) -> dict:
+                          chunk_size: int = 1024 * 1024,
+                          update_file_path: bool = True,
+                          safe_filename: bool = True) -> dict:
         """
         Write file as a streaming process to storage.
 
@@ -149,10 +157,12 @@ class PumpWoodStorage():
                 unique.
             chunk_size (str): Chuck size of the streaming.
         """
-        file_path = self._update_file_path(file_path)
-        file_name = self._create_safe_filename(
-            file_name=file_name, unique_name=unique_name)
-        file_path = file_path + file_name
+        if update_file_path:
+            file_path = self._update_file_path(file_path)
+        if safe_filename:
+            file_name = self._create_safe_filename(
+                file_name=file_name, unique_name=unique_name)
+        file_path = os.path.join(file_path, file_name)
         return self.storage_object.write_file_stream(
             file_path=file_path, data_stream=data_stream,
             chunk_size=chunk_size)

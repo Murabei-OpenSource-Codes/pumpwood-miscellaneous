@@ -133,7 +133,7 @@ class PumpWoodAwsS3():
             No particular raises at this function.
         """
         self._s3_resource.upload_fileobj(
-            Fileobj=data, Bucket=self._bucket_name,
+            Fileobj=data_stream, Bucket=self._bucket_name,
             Key=file_path)
         response = self._s3_resource.get_object(
             Bucket=self._bucket_name, Key=file_path)
