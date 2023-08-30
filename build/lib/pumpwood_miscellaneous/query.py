@@ -24,16 +24,16 @@ def open_composite_pk(query_dict: dict, is_filter: bool) -> dict:
     Args:
         query_dict [dict]:
         filter [bool]:
-    
+
     Kwargs:
         No kwargs.
-    
+
     Return [dict]:
         Dictionary with adjusted filter and exclude dictionaries.
     """
 
     def convert_np(obj):
-        """Helps to treat numpy types that are not converted by SQLAlchemy."""
+        """Help to treat numpy types that are not converted by SQLAlchemy."""
         if isinstance(obj, np.generic):
             return obj.item()
         else:
@@ -114,6 +114,7 @@ class SqlalchemyQueryMisc():
     """Class to help building queries with dictionary of list."""
 
     _underscore_operators = {
+        'eq': lambda c, x: operators.eq(c, x),
         'gt': lambda c, x: operators.gt(c, x),
         'lt': lambda c, x: operators.lt(c, x),
         'gte': lambda c, x: operators.ge(c, x),
