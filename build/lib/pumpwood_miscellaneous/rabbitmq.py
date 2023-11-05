@@ -87,6 +87,7 @@ class PumpWoodRabbitMQ:
         channel.basic_publish(
             exchange='', routing_key=queue, body=json.dumps(
                 data, cls=PumpWoodJSONEncoder, ignore_nan=True))
+        connection.close()
 
     def connect_and_read(self, queue: str):
         """
@@ -111,11 +112,13 @@ class PumpWoodRabbitMQ:
             queue=queue, no_ack=False)
         if method_frame is not None:
             channel.basic_ack(method_frame.delivery_tag)
+            connection.close()
             return {
                 "method_frame": method_frame,
                 "header_frame": header_frame,
                 "body": body}
         else:
+            connection.close()
             return None
 
     def connect_and_queue_purge(self, queue: str) -> bool:
@@ -137,4 +140,5 @@ class PumpWoodRabbitMQ:
         channel = connection.channel()
         channel.queue_declare(queue=queue)
         channel.queue_purge(queue=queue)
+        connection.close()
         return True
