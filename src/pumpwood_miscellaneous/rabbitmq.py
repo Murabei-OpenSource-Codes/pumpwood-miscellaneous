@@ -87,3 +87,33 @@ class PumpWoodRabbitMQ:
         channel.basic_publish(
             exchange='', routing_key=queue, body=json.dumps(
                 data, cls=PumpWoodJSONEncoder, ignore_nan=True))
+
+    def connect_and_read(self, queue: str):
+        """
+        Read message from RabbitMQ queue and ack.
+
+        Args:
+            queue [str]: Queue name.
+        Kwargs:
+            No Kwargs.
+        Return [dict]:
+            Return a dictionary with method_frame, header_frame, body.
+        """
+        credentials = pika.PlainCredentials(self._username, self._password)
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=self._host, credentials=credentials,
+                port=self._port))
+        channel = connection.channel()
+        channel.queue_declare(queue=queue)
+
+        method_frame, header_frame, body = channel.basic_get(
+            queue=queue, no_ack=False)
+        if method_frame is not None:
+            channel.basic_ack(method_frame.delivery_tag)
+            return {
+                "method_frame": method_frame,
+                "header_frame": header_frame,
+                "body": body}
+        else:
+            return None
