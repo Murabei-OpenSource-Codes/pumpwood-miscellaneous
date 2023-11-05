@@ -117,3 +117,24 @@ class PumpWoodRabbitMQ:
                 "body": body}
         else:
             return None
+
+    def connect_and_queue_purge(self, queue: str) -> bool:
+        """
+        Connect to RabbitMQ and purge all pending messages.
+
+        Args:
+            queue [str]:
+        Kwargs:
+            No kwargs.
+        Return [bool]:
+            Return True
+        """
+        credentials = pika.PlainCredentials(self._username, self._password)
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=self._host, credentials=credentials,
+                port=self._port))
+        channel = connection.channel()
+        channel.queue_declare(queue=queue)
+        channel.queue_purge(queue=queue)
+        return True
