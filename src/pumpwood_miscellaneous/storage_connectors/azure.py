@@ -142,7 +142,7 @@ class PumpWoodAzureStorage():
             Exception('file_path %s does not exist' % file_path)
         blob.delete_blob()
 
-        if not blob.exists():
+        if blob.exists():
             raise Exception("Blob was not deleted from Azure")
         return True
 

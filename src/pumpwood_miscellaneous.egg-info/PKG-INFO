@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pumpwood-miscellaneous
-Version: 0.22
+Version: 0.23
 Summary: Miscellaneous class and funcitions used in Pumpwood.
 Home-page: https://github.com/Murabei-OpenSource-Codes/pumpwood-miscellaneous
 Author: Murabei Data Science
@@ -11,6 +11,18 @@ Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: djangorestframework>=3.1
+Requires-Dist: python-slugify>=6.1.1
+Requires-Dist: pandas>=1.0
+Requires-Dist: boto3==1.26.101
+Requires-Dist: google-cloud-storage==1.28.1
+Requires-Dist: markupsafe==2.0.1
+Requires-Dist: pika==0.12
+Requires-Dist: Werkzeug==1.0.1
+Requires-Dist: azure-storage-blob==12.12.0
+Requires-Dist: Flask-SQLAlchemy==2.3.2
+Requires-Dist: GeoAlchemy2==0.9.3
+Requires-Dist: Flask==1.1.4
 
 # Pumpwood Miscellaneous
 Pumpwood miscellaneous functions and classes.
