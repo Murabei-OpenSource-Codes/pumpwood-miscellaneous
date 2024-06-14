@@ -70,8 +70,9 @@ class PumpWoodAzureStorage():
                 'fail' (fail if file exists)]
             content_type (str): Mime-type of the content.
         """
-        if_exists_opt = ['overwrite', 'overwrite_streaming', 'append_breakline',
-                         'append', 'fail']
+        if_exists_opt = [
+            'overwrite', 'overwrite_streaming', 'append_breakline',
+            'append', 'fail']
         if if_exists in if_exists_opt:
             Exception("if_exists must be in {}".format(if_exists_opt))
 
