@@ -73,8 +73,9 @@ class PumpWoodAzureStorage():
         if_exists_opt = [
             'overwrite', 'overwrite_streaming', 'append_breakline',
             'append', 'fail']
-        if if_exists in if_exists_opt:
-            Exception("if_exists must be in {}".format(if_exists_opt))
+        if if_exists not in if_exists_opt:
+            msg = "if_exists must be in {}".format(if_exists_opt)
+            raise Exception(msg)
 
         blob = self._client.get_blob_client(blob=file_path)
         blob_exists = blob.exists()

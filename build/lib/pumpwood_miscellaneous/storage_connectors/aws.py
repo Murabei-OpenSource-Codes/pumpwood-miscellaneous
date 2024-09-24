@@ -29,10 +29,10 @@ class PumpWoodAwsS3():
         if AWS_SECRET_ACCESS_KEY is None:
             AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
         if AWS_ACCESS_KEY_ID is None or AWS_SECRET_ACCESS_KEY is None:
-            raise Exception(
-                "AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY not passed as "
-                "arguments and not set as enviroment variables")
-
+            msg = (
+                "AWS_SECRET_ACCESS_KEY or AWS_ACCESS_KEY_ID not set. "
+                "Node role will be used to access S3")
+            print(msg)
         self._bucket_name = bucket_name
         self._s3_resource = boto3.client(
             's3', aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -57,6 +57,7 @@ class PumpWoodAwsS3():
                 return False
             else:
                 raise e
+
     def list_files(self, path: str = "") -> list:
         """
         List file at storage path.
@@ -66,10 +67,6 @@ class PumpWoodAwsS3():
         Return [list]:
             List of all files under path (sub-folders).
         """
-        self._s3_resource.put_object(
-            Body=data, Bucket=self._bucket_name,
-            Key=file_path)
-
         s3_files = self._s3_resource.list_objects(
             Bucket=self._bucket_name, Prefix=path)
         return [contents['Key'] for contents in s3_files['Contents']]
@@ -90,9 +87,9 @@ class PumpWoodAwsS3():
             content_type (str): Mime-type of the content.
         """
         if_exists_opt = ['overwrite', 'append_breakline', 'append', 'fail']
-
-        if if_exists in if_exists_opt:
-            Exception("if_exists must be in {}".format(if_exists_opt))
+        if if_exists not in if_exists_opt:
+            msg = "if_exists must be in {}".format(if_exists_opt)
+            raise Exception(msg)
 
         if self.check_file_exists(file_path=file_path):
             if if_exists == "fail":

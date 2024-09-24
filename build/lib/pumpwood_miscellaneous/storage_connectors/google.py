@@ -84,7 +84,7 @@ class PumpWoodGoogleBucket():
         if_exists_opt = [
             'overwrite', 'overwrite_streaming', 'append_breakline',
             'append', 'fail']
-        if if_exists in if_exists_opt:
+        if if_exists not in if_exists_opt:
             msg = "if_exists must be in {}".format(if_exists_opt)
             raise exceptions.PumpWoodNotImplementedError(msg)
 
