@@ -10,7 +10,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setuptools.setup(
     name='pumpwood-miscellaneous',
-    version='0.26.2',
+    version='0.26.3',
     include_package_data=True,
     license='BSD-3-Clause License',
     description='Miscellaneous class and funcitions used in Pumpwood.',
@@ -30,7 +30,7 @@ setuptools.setup(
         "boto3==1.26.101",
         "google-cloud-storage==1.28.1",
         "azure-storage-blob==12.12.0",
-        "Werkzeug>=3.1.3"
+        "Werkzeug>=3.1.3",
         "pika>=1.3.2",
         "GeoAlchemy2>=0.9.3",
         "Flask-SQLAlchemy>=2.3.2",
