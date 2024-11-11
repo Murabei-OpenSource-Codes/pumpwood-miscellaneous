@@ -24,7 +24,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setuptools.setup(
     name='pumpwood-miscellaneous',
-    version='0.25.2',
+    version='0.26.0',
     include_package_data=True,
     license='BSD-3-Clause License',
     description='Miscellaneous class and funcitions used in Pumpwood.',
@@ -38,7 +38,19 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     package_dir={"": "src"},
-    install_requires=requirements,
+    install_requires=[
+        "python-slugify>=6.1.1",
+        "pandas>=1.0",
+        "boto3==1.26.101",
+        "google-cloud-storage==1.28.1",
+        "azure-storage-blob==12.12.0",
+        "markupsafe==2.0.1",
+        "Werkzeug==1.0.1",
+        "pika==0.12",
+        "Flask-SQLAlchemy==2.3.2",
+        "GeoAlchemy2>=0.9.3",
+        "Flask>=1.1.4",
+    ],
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
 )

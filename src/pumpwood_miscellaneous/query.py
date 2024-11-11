@@ -1,9 +1,6 @@
-"""
-Build sqlalchemy queries from filter_dict, exclude_dict and order_by.
-"""
+"""Build sqlalchemy queries from filter_dict, exclude_dict and order_by."""
 import copy
 import numpy as np
-import simplejson as json
 import pandas as pd
 from sqlalchemy.sql import operators
 from sqlalchemy import func

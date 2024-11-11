@@ -3,10 +3,14 @@ import io
 import datetime
 import os
 from werkzeug.utils import secure_filename
-from .storage_connectors.google import PumpWoodGoogleBucket
-from .storage_connectors.local import PumpWoodLocalBucket
-from .storage_connectors.aws import PumpWoodAwsS3
-from .storage_connectors.azure import PumpWoodAzureStorage
+from pumpwood_miscellaneous.storage_connectors.google import (
+    PumpWoodGoogleBucket)
+from pumpwood_miscellaneous.storage_connectors.local import (
+    PumpWoodLocalBucket)
+from pumpwood_miscellaneous.storage_connectors.aws import (
+    PumpWoodAwsS3)
+from pumpwood_miscellaneous.storage_connectors.azure import (
+    PumpWoodAzureStorage)
 
 
 def allowed_extension(filename, allowed_extensions,
