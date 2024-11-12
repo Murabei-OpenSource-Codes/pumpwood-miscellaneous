@@ -27,9 +27,9 @@ setuptools.setup(
     install_requires=[
         "python-slugify>=6.1.1",
         "pandas>=1.0",
-        "boto3==1.26.101",
-        "google-cloud-storage==1.28.1",
-        "azure-storage-blob==12.12.0",
+        "boto3==1.35.58",
+        "google-cloud-storage==2.18.2",
+        "azure-storage-blob==12.23.1",
         "Werkzeug>=3.1.3",
         "pika>=1.3.2",
         "GeoAlchemy2>=0.9.3",
