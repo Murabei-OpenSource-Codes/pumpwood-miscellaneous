@@ -109,7 +109,7 @@ class PumpWoodRabbitMQ:
         channel.queue_declare(queue=queue)
 
         method_frame, header_frame, body = channel.basic_get(
-            queue=queue, no_ack=False)
+            queue=queue, auto_ack=True)
         if method_frame is not None:
             channel.basic_ack(method_frame.delivery_tag)
             connection.close()
