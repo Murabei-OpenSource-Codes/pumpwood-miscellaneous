@@ -7,8 +7,7 @@ from pumpwood_communication.serializers import pumpJsonDump
 def build_engine_string(dialect: str, database: str, driver: str = None,
                         username: str = None, password: str = None,
                         host: str = None, port: str = None, ssl: str = None):
-    """
-    Build SQLAlchemy engine string acordind to database parameters.
+    """Build SQLAlchemy engine string acordind to database parameters.
 
     Args:
         dialect (str): Dialect string
@@ -19,6 +18,7 @@ def build_engine_string(dialect: str, database: str, driver: str = None,
         password (str): Database password
         host (str): Database host
         port (str): Database port
+        ssl (str): If ssl will be required.
 
     Raises:
         Exception:
@@ -63,6 +63,7 @@ def build_engine_string(dialect: str, database: str, driver: str = None,
 class SQLAlchemyPostGres(SQLAlchemy):
     """Inicialize SQLAlchemy with a few tricks for PostGres."""
     def apply_driver_hacks(self, app, info, options):
+        """Adjust connection to pre-ping and used Pumpwood Json."""
         options.update({
             "pool_pre_ping": True, "json_serializer": pumpJsonDump})
         super(SQLAlchemyPostGres, self).apply_driver_hacks(app, info, options)

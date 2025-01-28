@@ -10,7 +10,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setuptools.setup(
     name='pumpwood-miscellaneous',
-    version='1.0.1',
+    version='1.0.2',
     include_package_data=True,
     license='BSD-3-Clause License',
     description='Miscellaneous class and funcitions used in Pumpwood.',

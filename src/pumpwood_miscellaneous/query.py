@@ -11,16 +11,18 @@ from pumpwood_communication.serializers import CompositePkBase64Converter
 
 
 def open_composite_pk(query_dict: dict, is_filter: bool) -> dict:
-    """
-    Open filter/exclude dictionary with pk on composite primary keys.
+    """Open filter/exclude dictionary with pk on composite primary keys.
 
     Open filter dict to filter all components of the composite primary
     keys. For exclude dict use just the id field from the composite
     primary.
 
     Args:
-        query_dict [dict]:
-        filter [bool]:
+        query_dict (dict):
+            Query dictionary containing information of the filters, exclude
+            and order by that will be applied.
+        is_filter (bool):
+            If the pk will be used on filter or on exclude clauses.
 
     Kwargs:
         No kwargs.
@@ -41,7 +43,7 @@ def open_composite_pk(query_dict: dict, is_filter: bool) -> dict:
     # information.
     #
     # Filter queries, use both id and other primary keys elements to
-    # help postgres to prune sub-partitions on query execution.
+    # help Postgres to prune sub-partitions on query execution.
     #
     # On exclude query, using just id is the same of including all
     # composite primary fields. Since exclude filter might not lead to
@@ -70,14 +72,15 @@ def open_composite_pk(query_dict: dict, is_filter: bool) -> dict:
                             pd.Series(new_query_dict["pk__in"]).apply(
                                 CompositePkBase64Converter.load).tolist())
                     for col in open_composite.columns:
-                        new_query_dict[col + "__in"] = \
-                            [convert_np(x) for x in open_composite[col].unique()]
+                        new_query_dict[col + "__in"] = [
+                            convert_np(x)
+                            for x in open_composite[col].unique()]
                 else:
                     open_composite = pd.DataFrame(
                             pd.Series(new_query_dict["pk__in"]).apply(
                                 CompositePkBase64Converter.load).tolist())
-                    new_query_dict["id__in"] = \
-                        [convert_np(x) for x in open_composite["id"].unique()]
+                    new_query_dict["id__in"] = [
+                        convert_np(x) for x in open_composite["id"].unique()]
 
                 count_pk_filters = count_pk_filters + 1
                 del new_query_dict["pk__in"]
