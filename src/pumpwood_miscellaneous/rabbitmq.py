@@ -12,15 +12,19 @@ class PumpWoodRabbitMQ:
 
     def __init__(self, queue: str = None, username: str = None,
                  password: str = None, host: str = None, port: int = None):
-        """
-        Start PumpWood RabbitMQ connection.
+        """Start PumpWood RabbitMQ connection.
 
         Args:
-            queue(str): Name of queue that will used in the service.
-            username(str): Username to be used in the connection.
-            password(str): Password to be used in the connection.
-            host(str): Host to be used in the connection.
-            port(int): Port yo be used in the connection.
+            queue(str):
+                Name of queue that will used in the service.
+            username(str):
+                Username to be used in the connection.
+            password(str):
+                Password to be used in the connection.
+            host(str):
+                Host to be used in the connection.
+            port(int):
+                Port yo be used in the connection.
 
         Kwargs:
             No extra fields.
@@ -57,9 +61,11 @@ class PumpWoodRabbitMQ:
         """Send RabbitMQ a msg.
 
         Args:
-            data(any): Data to be sent to RabbitMQ.
-        Kwargs:
-            queue(str): An different queue to send data.
+            data(any):
+                Data to be sent to RabbitMQ.
+            queue(str):
+                An different queue to send data.
+
         Returns:
             str: File name that was written.
 
@@ -90,14 +96,13 @@ class PumpWoodRabbitMQ:
         connection.close()
 
     def connect_and_read(self, queue: str):
-        """
-        Read message from RabbitMQ queue and ack.
+        """Read message from RabbitMQ queue and ack.
 
         Args:
-            queue [str]: Queue name.
-        Kwargs:
-            No Kwargs.
-        Return [dict]:
+            queue (str):
+                Queue name.
+
+        Return:
             Return a dictionary with method_frame, header_frame, body.
         """
         credentials = pika.PlainCredentials(self._username, self._password)
@@ -122,14 +127,12 @@ class PumpWoodRabbitMQ:
             return None
 
     def connect_and_queue_purge(self, queue: str) -> bool:
-        """
-        Connect to RabbitMQ and purge all pending messages.
+        """Connect to RabbitMQ and purge all pending messages.
 
         Args:
-            queue [str]:
-        Kwargs:
-            No kwargs.
-        Return [bool]:
+            queue (str):
+                Queue name to be purged
+        Return:
             Return True
         """
         credentials = pika.PlainCredentials(self._username, self._password)
