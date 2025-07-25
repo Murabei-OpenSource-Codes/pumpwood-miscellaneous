@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Database helper functions module."""
+from sqlalchemy import MetaData
 from flask_sqlalchemy import SQLAlchemy
 from pumpwood_communication.serializers import pumpJsonDump
 
@@ -62,6 +63,13 @@ def build_engine_string(dialect: str, database: str, driver: str = None,
 
 class SQLAlchemyPostGres(SQLAlchemy):
     """Inicialize SQLAlchemy with a few tricks for PostGres."""
+
+    def __init__(self, *args, **kwargs):
+        """__init__."""
+        # Inject schema-aware metadata if not explicitly set
+        kwargs.setdefault('metadata', MetaData(schema="public"))
+        super().__init__(*args, **kwargs)
+
     def apply_driver_hacks(self, app, info, options):
         """Adjust connection to pre-ping and used Pumpwood Json."""
         options.update({
