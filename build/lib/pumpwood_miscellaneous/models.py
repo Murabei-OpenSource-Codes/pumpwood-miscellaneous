@@ -9,5 +9,5 @@ class FlaskPumpWoodBaseModel(DeclarativeBase):
     - adds a id column for all models
     """
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     '''All tables must have primary id'''
