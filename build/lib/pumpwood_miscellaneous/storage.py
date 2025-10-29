@@ -72,11 +72,11 @@ class PumpWoodStorage():
             else file_path)
 
     def check_file_exists(self, file_path: str) -> bool:
-        """
-        Check if file exists.
+        """Check if file exists.
 
         Args:
-            file_path [str]: Path to file in storage.
+            file_path (str):
+                Path to file in storage.
 
         Return:
             Return a boolean value checking if the file exists on storage.
@@ -86,12 +86,13 @@ class PumpWoodStorage():
 
     def list_files(self, path: str = "",
                    update_file_path: bool = True) -> list:
-        """
-        List file at storage path.
+        """List file at storage path.
 
         Args:
-            path [str]: Path of the storage to list files.
-            update_file_path [bool]: If update path to add base directory.
+            path (str):
+                Path of the storage to list files.
+            update_file_path (bool):
+                If update path to add base directory.
         Return [list]:
             List of all files under path (sub-folders).
         """
@@ -103,8 +104,7 @@ class PumpWoodStorage():
                    unique_name: bool = False, if_exists: str = 'fail',
                    content_type='text/plain', update_file_path: bool = True,
                    safe_filename: bool = True):
-        r"""
-        Write a file to the storage.
+        r"""Write a file to the storage.
 
         Args:
             file_path(str): Path which will be used to save files at storage
@@ -149,8 +149,7 @@ class PumpWoodStorage():
                           chunk_size: int = 1024 * 1024,
                           update_file_path: bool = True,
                           safe_filename: bool = True) -> dict:
-        """
-        Write file as a streaming process to storage.
+        """Write file as a streaming process to storage.
 
         Args:
             file_path (str): Path to be used on file.
@@ -172,8 +171,7 @@ class PumpWoodStorage():
             chunk_size=chunk_size)
 
     def delete_file(self, file_path: str):
-        """
-        Delete a file from storage.
+        """Delete a file from storage.
 
         Args:
             file_path(str): Path which will be used to save files at storage
@@ -198,8 +196,7 @@ class PumpWoodStorage():
             file_path=file_path)
 
     def read_file(self, file_path: str):
-        """
-        Read a file from storage.
+        """Read a file from storage.
 
         Args:
             file_path(str): File path.
@@ -223,8 +220,7 @@ class PumpWoodStorage():
         return self.storage_object.read_file(file_path=file_path)
 
     def download_to_file(self, file_path: str, file_obj):
-        """
-        Download cloud file to a file like object.
+        """Download cloud file to a file like object.
 
         Args:
             file_path (str): Cloud file path.
@@ -238,8 +234,7 @@ class PumpWoodStorage():
             file_path=file_path, file_obj=file_obj)
 
     def get_read_file_iterator(self, file_path):
-        """
-        Get an iterator to download file by chunks.
+        """Get an iterator to download file by chunks.
 
         Args:
             file_path(str): File path.
@@ -264,8 +259,7 @@ class PumpWoodStorage():
 
     def _create_safe_filename(self, file_name: str,
                               unique_name: bool = False) -> str:
-        """
-        Create a safe filename including datetime to its name.
+        """Create a safe filename including datetime to its name.
 
         Args:
             file_name(str): File path.
@@ -294,8 +288,7 @@ class PumpWoodStorage():
             return "{0}___{1}".format(date, file_name)
 
     def get_file_hash(self, file_path: str):
-        """
-        Return file hash calculated at cloud storage provider.
+        """Return file hash calculated at cloud storage provider.
 
         Args:
             file_path (str): File path.

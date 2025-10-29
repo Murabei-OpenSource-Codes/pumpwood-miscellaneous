@@ -170,8 +170,7 @@ class SqlalchemyQueryMisc():
     @classmethod
     def get_related_models_and_columns(cls, object_model, query_dict,
                                        order=False):
-        """
-        Get related model and columns.
+        """Get related model and columns.
 
         Receive a Django like dictionary and return a dictionary with the
         related models mapped by query string and the columns and operators to
@@ -181,14 +180,15 @@ class SqlalchemyQueryMisc():
         ascendent and decrescent order respectively.
 
         Args:
-            object_model (sqlalchemy.DeclarativeModel): Model over which will
+            object_model (sqlalchemy.DeclarativeModel):
+                Model over which will
                 be performed the queries.
-            query_dict (dict): A query dict similar to Django queries,
+            query_dict (dict):
+                A query dict similar to Django queries,
                 with relations and operator divided
-            by "__".
-
-        Kwargs:
-            No extra arguments
+                by "__".
+            order (bool):
+                If there is order_by clause on query.
 
         Returns:
             dict: Key 'models' indicates models to be used in joins and
@@ -259,8 +259,8 @@ class SqlalchemyQueryMisc():
 
                 # Check if a search for a relation
                 if token in relations.keys():
-                    # It is not possible to query for relations after specifying
-                    # a column
+                    # It is not possible to query for relations after
+                    # specifying a column
                     if column is not None:
                         template = "It is not permited more relations " + \
                             "after column underscore (%s). Original query " + \
@@ -272,7 +272,7 @@ class SqlalchemyQueryMisc():
                     join_models.append(relations[token])
 
                 # Check if is search for primary_key
-                elif token == 'pk':
+                elif token == 'pk': # NOQA
                     column = mapper.primary_key[0]
 
                 # Check if is search for column
@@ -344,33 +344,37 @@ class SqlalchemyQueryMisc():
         return {'models': join_models, 'columns': columns_values_filter}
 
     @classmethod
-    def sqlalchemy_kward_query(cls, object_model, filter_dict={},
-                               exclude_dict={}, order_by=[]):
-        """
-        Build SQLAlchemy engine string according to database parameters.
+    def sqlalchemy_kward_query(cls, object_model,
+                               filter_dict: None | dict = None,
+                               exclude_dict: None | dict = None,
+                               order_by: None | list[str] = None,):
+        """Build SQLAlchemy engine string according to database parameters.
 
         Args:
-            filter_dict (dict): Dictionary to be used in filtering.
-            exclude_dict (dict): Dictionary to be used in excluding.
-            order_by (list): Dictionary to be used as ordering.
-        Kwargs:
-            No extra arguments
+            object_model:
+                SQLAlchemy declarative model used on query.
+            filter_dict (dict):
+                Dictionary to be used in filtering.
+            exclude_dict (dict):
+                Dictionary to be used in excluding.
+            order_by (list):
+                Dictionary to be used as ordering.
 
-        Raises:
-            No raises implemented
-
-        Return:
+        Returns:
             sqlalquemy.query: Returns an sqlalchemy with filters applied.
 
-        Example:
+        Examples:
         >>> query = SqlalchemyQueryMisc.sqlalchemy_kward_query(
                 object_model=DataBaseVariable
                 filter_dict={'attribute__description__contains': 'Oi' ,
                              'value__gt': 2}
                 exclude_dict={'modeling_unit__description__exact': 'Mod_3'}
                 order_by = ['-value', 'attribute__description'])
-
         """
+        filter_dict = {} if filter_dict is None else filter_dict
+        exclude_dict = {} if exclude_dict is None else exclude_dict
+        order_by = [] if order_by is None else order_by
+
         mapper = inspect(object_model.__table__)
         primary_keys = [
             col.name for col in list(mapper.c) if col.primary_key]
