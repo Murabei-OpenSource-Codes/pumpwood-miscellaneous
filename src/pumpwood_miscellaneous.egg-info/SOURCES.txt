@@ -5,6 +5,7 @@ pyproject.toml
 setup.py
 src/pumpwood_miscellaneous/__init__.py
 src/pumpwood_miscellaneous/database.py
+src/pumpwood_miscellaneous/error.py
 src/pumpwood_miscellaneous/models.py
 src/pumpwood_miscellaneous/query.py
 src/pumpwood_miscellaneous/rabbitmq.py
