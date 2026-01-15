@@ -125,7 +125,7 @@ class PumpWoodAzureStorage():
             blob.delete_blob()
 
         file_stream_obj = AzureStorageUploadFileStream(
-            client=blob, data_stream=data_stream)
+            blob=blob, data_stream=data_stream)
         file_stream_obj.write()
 
         properties = blob.get_blob_properties()
