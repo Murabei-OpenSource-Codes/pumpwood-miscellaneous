@@ -97,12 +97,18 @@ class PumpWoodAzureStorage():
         blob.upload_blob(data)
         return file_path
 
-    def write_file_stream(self, file_path: str, data_stream: io.BytesIO):
+    def write_file_stream(self, file_path: str, data_stream: io.BytesIO,
+                          **kwargs):
         """Write file as stream to google cloud.
 
         Args:
-            file_path (str): Path to save the stream in Google Storage Bucket.
-            data_stream (io.BytesIO): Data stream.
+            file_path (str):
+                Path to save the stream in Google Storage Bucket.
+            data_stream (io.BytesIO):
+                Data stream.
+            **kwargs:
+                Other un used parameters that may be passed by
+                general storage object.
 
         Returns:
             Return the file path used to save data ("file_path" key) and the
@@ -131,8 +137,10 @@ class PumpWoodAzureStorage():
         """Return an iterator to stream download data in flask.
 
         Args:
-            file_path (str): Storage path.
-            chunk_size (int): Chunk size in bytes, default to 1Mb.
+            file_path (str):
+                Storage path.
+            chunk_size (int):
+                Chunk size in bytes, default to 1Mb.
 
         Raises:
             No specific raises.
@@ -141,12 +149,12 @@ class PumpWoodAzureStorage():
             blob=file_path).download_blob()
         return download_blob.chunks()
 
-    def delete_file(self, file_path: str):
+    def delete_file(self, file_path: str) -> bool:
         """Delete file from storage.
 
         Args:
             file_path (str):
-
+                Storage path.
         """
         blob = self._client.get_blob_client(blob=file_path)
         if not blob.exists():
@@ -238,6 +246,7 @@ class AzureStorageUploadFileStream:
         return True
 
     def get_bytes_uploaded(self):
+        """Get the number of bytes that were uploaded for validation."""
         return self._stream.bytes_position
 
 

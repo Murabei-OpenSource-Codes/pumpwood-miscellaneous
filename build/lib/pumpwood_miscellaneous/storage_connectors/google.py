@@ -1,6 +1,5 @@
 """Google Storage Cloud."""
 import io
-import pandas as pd
 from typing import Callable, List
 from google.cloud import storage
 from google.cloud.storage.blob import Blob
@@ -16,8 +15,7 @@ class PumpWoodGoogleBucket():
     """Class to make comunication with Google Cloud Storage."""
 
     def __init__(self, bucket_name):
-        """
-        __init__.
+        """__init__.
 
         Args:
             bucket_name (str): Name of the bucket.
@@ -27,12 +25,12 @@ class PumpWoodGoogleBucket():
         self._google_bucket = self._client.bucket(bucket_name)
 
     def check_file_exists(self, file_path: str) -> bool:
-        """
-        Check if file exists.
+        """Check if file exists.
 
         Args:
-            file_path [str]:
+            file_path (str):
                 Path to file in storage.
+
         Returns:
             Return a boolean value checking if the file exists on storage.
         """
@@ -40,13 +38,13 @@ class PumpWoodGoogleBucket():
         return blob.exists()
 
     def list_files(self, path: str = "") -> List[str]:
-        """
-        List file at storage path.
+        """List file at storage path.
 
         Args:
-            path [str]:
+            path (str):
                 Path of the storage to list files.
-        Returns [List[str]]:
+
+        Returns (List[str]):
             List of all files under path (sub-folders).
         """
         blobs = self._google_bucket.list_blobs(prefix=path)
@@ -54,24 +52,25 @@ class PumpWoodGoogleBucket():
 
     def write_file(self, file_path: str, data: bytes, if_exists: str = 'fail',
                    content_type='text/plain') -> str:
-        """
-        Write file on Google Bucket.
+        """Write file on Google Bucket.
 
         Args:
-            file_path [str]:
+            file_path (str):
                 Path to save the file.
-            data [str]:
+            data (str):
                 File content in bytes.
-            if_exists [str]:
+            if_exists (str):
                 if_exists must be in 'overwrite',
                 'overwrite_streaming' (stream file to overwrite if exists),
                 'append_breakline' (append content with a breakline between),
                 'append' (append content without break line),
                 'fail' (fail if file exists)]
-            content_type [str]:
+            content_type (str):
                 Mime-type of the content.
+
         Returns:
             A string with bucket path.
+
         Raises:
             PumpWoodForbidden:
                 'There is a file with same name on bucket'. If
@@ -104,18 +103,20 @@ class PumpWoodGoogleBucket():
 
     def write_file_stream(self, file_path: str, data_stream: io.BytesIO,
                           chunk_size: int = 1024 * 1024):
-        """
-        Write file as stream to google cloud.
+        """Write file as stream to google cloud.
 
         Args:
-            file_path (str): Path to save the stream in Google Storage Bucket.
-            data_stream (io.BytesIO): Data stream.
-        Kwargs:
+            file_path (str):
+                Path to save the stream in Google Storage Bucket.
+            data_stream (io.BytesIO):
+                Data stream.
             chunk_size(int): Size of the chuck to be transmited, default for
                 1024 * 1024 (1Mb).
-        Return (dict):
+
+        Returns:
             Return the file path used to save data ("file_path" key) and the
             total of bytes that were transmited.
+
         Raises:
             No particular raises at this function.
         """
@@ -132,15 +133,16 @@ class PumpWoodGoogleBucket():
         return {
             "file_path": file_path, "bytes_uploaded": bytes_uploaded}
 
-    def get_read_file_iterator(self,  file_path: str,
+    def get_read_file_iterator(self, file_path: str,
                                chunk_size: int = 1024 * 1024) -> Callable:
-        """
-        Return an iterator to stream download data in flask.
+        """Return an iterator to stream download data in flask.
 
         Args:
-            file_path (str): Storage path.
-        Kwargs:
-            chunk_size (int): Chunk size in bytes, default to 1Mb.
+            file_path (str):
+                Storage path.
+            chunk_size (int):
+                Chunk size in bytes, default to 1Mb.
+
         Raises:
             No specific raises.
         """
@@ -151,14 +153,15 @@ class PumpWoodGoogleBucket():
         return file_stream_obj.read_iterator()
 
     def delete_file(self, file_path: str) -> bool:
-        """
-        Delete file from storage.
+        """Delete file from storage.
 
         Args:
-            file_path [str]:
+            file_path (str):
                 Path of the file that will be deleted
+
         Returns:
             Return True if file is deleted.
+
         Raises:
             PumpWoodObjectDoesNotExist:
                 'file_path %s does not exist' % file_path. Indicates that
@@ -172,17 +175,18 @@ class PumpWoodGoogleBucket():
         return True
 
     def read_file(self, file_path: str) -> dict:
-        """
-        Read file content from storage.
+        """Read file content from storage.
 
         Args:
-            file_path [str]:
+            file_path (str):
                 Path of the file at the storage.
+
         Returns:
             A dictionary with keys.
             - **data:** Binary data from the file.
             - **content_type:** Content type at the storage, usually not
                 correct.
+
         Raises:
             PumpWoodObjectDoesNotExist:
                 'file_path {file_path} does not exist'. Raise error when file
@@ -197,13 +201,15 @@ class PumpWoodGoogleBucket():
         content_type = blob.content_type
         return {'data': data, 'content_type': content_type}
 
-    def download_to_file(self, file_path: str, file_obj):
-        """
-        Download file from storage and save it in a local path.
+    def download_to_file(self, file_path: str, file_obj) -> None:
+        """Download file from storage and save it in a local path.
 
         Args:
-            file_obj (any): A file like object.
-            local_path (str): Local path to save file.
+            file_obj (any):
+                A file like object.
+            file_path (str):
+                Local path to save file.
+
         Kwargs:
             No Kwargs
         Raises:
@@ -216,20 +222,19 @@ class PumpWoodGoogleBucket():
             msg = 'file_path %s does not exist' % file_path
             raise exceptions.PumpWoodObjectDoesNotExist(msg)
 
-        blob = self._google_bucket.blob(file_path, chunk_size=262144*5)
+        blob = self._google_bucket.blob(file_path, chunk_size=262144 * 5)
         blob.download_to_file(file_obj)
         file_obj.close()
 
-    def get_file_hash(self, file_path: str):
-        """
-        Return file hash calculated at cloud storage provider.
+    def get_file_hash(self, file_path: str) -> str:
+        """Return file hash calculated at cloud storage provider.
 
         Args:
             file_path (str): File path.
-        Kwargs:
-            No Kwargs.
+
         Returns:
             str: Hash of the file.
+
         Raises:
             PumpWoodObjectDoesNotExist:
                 "file_path {file_path} does not exist", If file is not found
@@ -249,6 +254,20 @@ class GoogleStorageUploadFileStream:
 
     def __init__(self, client: storage.Client, blob: Blob,
                  bucket_name: str, chunk_size: int, data_stream: io.BytesIO):
+        """__init__.
+
+        Args:
+            client (storage.Client):
+                Storage client of google cloud.
+            blob (Blob):
+                GCP blob storage object.
+            bucket_name (str):
+                Name of the bucket that will be used to save data.
+            chunk_size (int):
+                Size the the chunk used on interation.
+            data_stream (io.BytesIO):
+                A stream of data that will be used to upload data to storage.
+        """
         self._client = client
         self._transport = AuthorizedSession(
             credentials=self._client._credentials)
@@ -270,10 +289,12 @@ class GoogleStorageUploadFileStream:
             metadata={'name': self._blob.name})
 
     def write(self):
+        """Write function."""
         self._request.transmit_next_chunk(self._transport)
         return self._request.finished
 
     def get_bytes_uploaded(self):
+        """Get the number of bytes that was uploaded for validation."""
         return self._request.bytes_uploaded
 
 
@@ -282,6 +303,20 @@ class GoogleStorageDownloadFileStream:
 
     def __init__(self, client: storage.Client, blob: Blob,
                  bucket_name: str, chunk_size: int):
+        """__init__.
+
+        Args:
+            client (storage.Client):
+                Storage client of google cloud.
+            blob (Blob):
+                GCP blob storage object.
+            bucket_name (str):
+                Name of the bucket that will be used to save data.
+            chunk_size (int):
+                Size the the chunk used on interation.
+            data_stream (io.BytesIO):
+                A stream of data that will be used to upload data to storage.
+        """
         self._client = client
         self._transport = AuthorizedSession(
             credentials=self._client._credentials)
