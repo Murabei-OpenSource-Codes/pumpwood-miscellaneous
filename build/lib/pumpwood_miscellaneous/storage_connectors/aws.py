@@ -9,25 +9,25 @@ from typing import Callable
 class PumpWoodAwsS3():
     """Class to make comunication with AWS S3 Storage."""
 
-    def __init__(self, bucket_name: str, AWS_ACCESS_KEY_ID: str = None,
-                 AWS_SECRET_ACCESS_KEY: str = None):
-        """
-        __init__.
+    def __init__(self, bucket_name: str, AWS_ACCESS_KEY_ID: str = None, # NOQA
+                 AWS_SECRET_ACCESS_KEY: str = None): # NOQA
+        """__init__.
 
         AWS credentials must be passed as arguments or set as enviroment
         variables: AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY
 
         Args:
-            bucket_name (str): Name of the bucket.
-        Kwargs:
-            AWS_ACCESS_KEY_ID [str]: Set Access key for AWS boto client.
-            AWS_SECRET_ACCESS_KEY [str]: Set Secret Access key for AWS boto
-                client.
+            bucket_name (str):
+                Name of the bucket.
+            AWS_ACCESS_KEY_ID (str):
+                Set Access key for AWS boto client.
+            AWS_SECRET_ACCESS_KEY (str):
+                Set Secret Access key for AWS boto client.
         """
         if AWS_ACCESS_KEY_ID is None:
-            AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+            AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID") # NOQA
         if AWS_SECRET_ACCESS_KEY is None:
-            AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+            AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY") # NOQA
         if AWS_ACCESS_KEY_ID is None or AWS_SECRET_ACCESS_KEY is None:
             msg = (
                 "AWS_SECRET_ACCESS_KEY or AWS_ACCESS_KEY_ID not set. "
@@ -39,11 +39,11 @@ class PumpWoodAwsS3():
             aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
 
     def check_file_exists(self, file_path: str) -> bool:
-        """
-        Check if file exists.
+        """Check if file exists.
 
         Args:
-            file_path [str]: Path to file in storage.
+            file_path (str):
+                Path to file in storage.
 
         Return:
             Return a boolean value checking if the file exists on storage.
@@ -59,12 +59,13 @@ class PumpWoodAwsS3():
                 raise e
 
     def list_files(self, path: str = "") -> list:
-        """
-        List file at storage path.
+        """List file at storage path.
 
         Args:
-            path [str]: Path of the storage to list files.
-        Return [list]:
+            path (str):
+                Path of the storage to list files.
+
+        Returns (list):
             List of all files under path (sub-folders).
         """
         s3_files = self._s3_resource.list_objects(
@@ -73,18 +74,21 @@ class PumpWoodAwsS3():
 
     def write_file(self, file_path: str, data: bytes, if_exists: str = 'fail',
                    content_type='text/plain') -> str:
-        """
-        Write file on Google Bucket.
+        """Write file on Google Bucket.
 
         Args:
-            file_path (str): Path to save the file.
-            data (str): File content in bytes.
-            if_exists (str): if_exists must be in 'overwrite',
-                'overwrite_streaming' (stream file to overwrite if exists),
-                'append_breakline' (append content with a breakline between),
-                'append' (append content without break line),
-                'fail' (fail if file exists)]
-            content_type (str): Mime-type of the content.
+            file_path (str):
+                Path to save the file.
+            data (str):
+                File content in bytes.
+            if_exists (str):
+                if_exists must be in 'overwrite', 'overwrite_streaming'
+                (stream file to overwrite if exists), 'append_breakline'
+                (append content with a breakline between),
+                'append' (append content without break line), 'fail'
+                (fail if file exists)]
+            content_type (str):
+                Mime-type of the content.
         """
         if_exists_opt = ['overwrite', 'append_breakline', 'append', 'fail']
         if if_exists not in if_exists_opt:
@@ -114,18 +118,21 @@ class PumpWoodAwsS3():
 
     def write_file_stream(self, file_path: str, data_stream: io.BytesIO,
                           chunk_size: int = 1024 * 1024):
-        """
-        Write file as stream to google cloud.
+        """Write file as stream to google cloud.
 
         Args:
-            file_path (str): Path to save the stream in Google Storage Bucket.
-            data_stream (io.BytesIO): Data stream.
-        Kwargs:
-            chunk_size(int): Size of the chuck to be transmited, default for
+            file_path (str):
+                Path to save the stream in Google Storage Bucket.
+            data_stream (io.BytesIO):
+                Data stream.
+            chunk_size (int):
+                Size of the chuck to be transmited, default for
                 1024 * 1024 (1Mb).
-        Return (dict):
+
+        Returns (dict):
             Return the file path used to save data ("file_path" key) and the
             total of bytes that were transmited.
+
         Raises:
             No particular raises at this function.
         """
@@ -139,13 +146,14 @@ class PumpWoodAwsS3():
             "bytes_uploaded": response["ContentLength"]}
 
     def get_read_file_iterator(self, file_path: str, **kwargs) -> Callable:
-        """
-        Return an iterator to stream download data in flask.
+        """Return an iterator to stream download data in flask.
 
         Args:
-            file_path (str): Storage path.
-        Kwargs:
-            No Kwargs
+            file_path (str):
+                Storage path.
+            **kwargs (dict):
+                Other parameters
+
         Raises:
             Exception('file_path {file_path} does not exist'): Raise if
                 file could not be found on s3.
@@ -157,13 +165,15 @@ class PumpWoodAwsS3():
         return response["Body"]
 
     def delete_file(self, file_path: str) -> bool:
-        """
-        Delete file from s3.
+        """Delete file from s3.
 
         Args:
-            file_path [str]: Path of the file to be deleted from s3.
-        Return [bool]:
+            file_path (str):
+                Path of the file to be deleted from s3.
+
+        Return (bool):
             Returns True
+
         Raise:
             Exception('file_path %s does not exist' % file_path):
             If file is not found on s3.
@@ -176,17 +186,19 @@ class PumpWoodAwsS3():
         return True
 
     def read_file(self, file_path: str):
-        """
-        Read file from S3.
+        """Read file from S3.
 
         Returns a dictionary with the content_type and data in bytes.
 
         Args:
-            file_path [str]: Path of the file to be read in s3.
-        Return [dict]:
+            file_path (str):
+                Path of the file to be read in s3.
+        Return (dict):
             A dictionary with:
-            - data [bytes]: With the content of the file.
-            - content_type [str]: Content type associated with the file.
+            - data (bytes):
+                With the content of the file.
+            - content_type (str):
+                Content type associated with the file.
         """
         try:
             head_data = self._s3_resource.head_object(
@@ -205,15 +217,15 @@ class PumpWoodAwsS3():
             'data': file_stream.getvalue(),
             'content_type': head_data["ContentType"]}
 
-    def download_to_file(self, file_path: str, file_obj):
-        """
-        Download file from storage and save it in a local path.
+    def download_to_file(self, file_path: str, file_obj) -> None:
+        """Download file from storage and save it in a local path.
 
         Args:
-            file_obj (any): A file like object or stream.
-            local_path (str): Local path to save file.
-        Kwargs:
-            No Kwargs
+            file_obj (any):
+                A file like object or stream.
+            file_path (str):
+                Path to save file.
+
         Raises:
             No specific raises.
         """
@@ -223,17 +235,18 @@ class PumpWoodAwsS3():
         file_obj.close()
 
     def get_file_hash(self, file_path: str):
-        """
-        Return file hash calculated at cloud storage provider.
+        """Return file hash calculated at cloud storage provider.
 
         Args:
-            file_path (str): File path.
-        Kwargs:
-            No Kwargs.
+            file_path (str):
+                File path.
+
         Returns:
             str: Hash of the file.
+
         Raises:
             Exception("file_path {file_path} does not exist")
                 If file is not found on storage.
         """
-        return "not implemented"
+        msg = "File hash retrive is not implemented for AWS provider"
+        raise NotImplementedError(msg)
