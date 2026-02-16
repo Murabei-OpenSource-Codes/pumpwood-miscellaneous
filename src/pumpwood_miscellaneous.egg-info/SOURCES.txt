@@ -22,4 +22,6 @@ src/pumpwood_miscellaneous/storage_connectors/azure.py
 src/pumpwood_miscellaneous/storage_connectors/google.py
 src/pumpwood_miscellaneous/storage_connectors/local.py
 src/pumpwood_miscellaneous/type/__init__.py
+src/pumpwood_miscellaneous/type/abc.py
 src/pumpwood_miscellaneous/type/action_return.py
+src/pumpwood_miscellaneous/type/info.py
