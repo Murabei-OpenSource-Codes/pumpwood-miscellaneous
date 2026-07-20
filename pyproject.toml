@@ -1,14 +1,14 @@
 [project]
 name = "pumpwood-miscellaneous"
-version = "1.1.5"
-description = "Miscellaneous class and funcitions used in Pumpwood
+version = "1.1.6"
+description = "Miscellaneous class and funcitions used in Pumpwood"
 readme = "README.md"
 requires-python = ">=3.6,<4.0"
 license = { text = "BSD-3-Clause License" }
 authors = [
     {name = "André Andrade Baceti", email = "a.baceti@murabei.com"}
 ]
-urls = { Homepage = "https://github.com/Murabei-OpenSource-Codes/pumpwood-miscellaneous" }
+urls = { Homepage = "https://github.com/Murabei-OpenSource-Codes/pumpwood-communication" }
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
@@ -27,7 +27,7 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "pumpwood_miscellaneous", from = "src"}]
+packages = [{include = "pumpwood_communication", from = "src"}]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
