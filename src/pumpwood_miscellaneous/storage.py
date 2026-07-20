@@ -107,16 +107,26 @@ class PumpWoodStorage():
         r"""Write a file to the storage.
 
         Args:
-            file_path(str): Path which will be used to save files at storage
-            data(bytes): File content.
-
-        Kwargs:
-            if_exists='fail'(str):
+            file_path(str):
+                Path which will be used to save files at storage
+            data(bytes):
+                File content.
+            file_name (str):
+                Name of the file that will be written on the storage.
+            if_exists(str): ='fail'
                 fail to raise Exception if exists, append_breakline to append
                 with a breakline between old content and new, append to
                 append without breakline, overwrite to overwrite file.
-
-            content_type='text/plain'(str): File content type.
+            content_type(str): ='text/plain'
+                File content type.
+            unique_name (bool):
+                If an unique name will be created using time and a random
+                sufix.
+            safe_filename (str):
+                If to create a safe file name.
+            update_file_path (bool):
+                If default file path should be added at the beginning of the
+                file path.
 
         Returns:
             str: File name that was written.
@@ -152,13 +162,23 @@ class PumpWoodStorage():
         """Write file as a streaming process to storage.
 
         Args:
-            file_path (str): Path to be used on file.
-            file_name (str): Name of the file.
-            data_stream (io.BytesIO): Data stream.
-        Kwargs:
-            unique_name (str): If date time will be used as sufix to make name
+            file_path (str):
+                Path to be used on file.
+            file_name (str):
+                Name of the file.
+            data_stream (io.BytesIO):
+                Data stream.
+            unique_name (str):
+                If date time will be used as sufix to make name
                 unique.
-            chunk_size (str): Chuck size of the streaming.
+            chunk_size (str):
+                Chuck size of the streaming.
+            safe_filename (bool):
+                If the filename should be added with a safe prefix do avoid
+                colision name.
+            update_file_path (bool):
+                To update the file path with the default path setting usually a
+                base folder for all files.
         """
         if update_file_path:
             file_path = self._update_file_path(file_path)

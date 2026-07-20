@@ -98,7 +98,7 @@ class PumpWoodAzureStorage():
         return file_path
 
     def write_file_stream(self, file_path: str, data_stream: io.BytesIO,
-                          **kwargs):
+                          chunk_size: int = None):
         """Write file as stream to google cloud.
 
         Args:
@@ -106,9 +106,8 @@ class PumpWoodAzureStorage():
                 Path to save the stream in Google Storage Bucket.
             data_stream (io.BytesIO):
                 Data stream.
-            **kwargs:
-                Other un used parameters that may be passed by
-                general storage object.
+            chunk_size:
+                Just for compatibility, it will not be used.
 
         Returns:
             Return the file path used to save data ("file_path" key) and the
